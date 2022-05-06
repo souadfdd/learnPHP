@@ -2,40 +2,37 @@
 namespace src\classes\base;
 
 /**
- * Classe d'aide à l'écriture des DAOs
- * pour le projet web de la première année génie informatique
- * Cette classe est écrite dans un cadre pédagogique
+ * Classe d'aide Ã  l'Ã©criture des DAOs
+ * pour le projet web de la premiÃ¨re annÃ©e gÃ©nie informatique
+ * Cette classe est Ã©crite dans un cadre pÃ©dagogique
  *
- * === Génie Informatique 1 ===
- *
- * @author Tarik BOUDAA
  *        
  */
 class GenericDaoImpl
 {
 
     /**
-     * Nom de la table sur la quelle seront executées les opérations
+     * Nom de la table sur la quelle seront executÃ©es les opÃ©rations
      */
     private $tableName;
 
     /**
-     * Nom de la classe entité sur laquelle seront executées les opérations
+     * Nom de la classe entitÃ© sur laquelle seront executÃ©es les opÃ©rations
      */
     private $className;
 
     /**
-     * identifiant de l'entité à manipuler
+     * identifiant de l'entitÃ© Ã  manipuler
      */
     private $entityId;
 
     /**
-     * encapsule en connexion à la base de données
+     * encapsule en connexion Ã  la base de donnÃ©es
      */
     private $connection;
 
     /**
-     * Objet de reflexion permettant d'accéder dynamiquement aux propriétés et méthodes d'une classe
+     * Objet de reflexion permettant d'accÃ©der dynamiquement aux propriÃ©tÃ©s et mÃ©thodes d'une classe
      */
     private $reflection;
 
@@ -68,22 +65,22 @@ class GenericDaoImpl
             $this->entityId = $id;
         }
 
-        // Creation d'un objet de connexion à la base de données
+        // Creation d'un objet de connexion Ã  la base de donnÃ©es
         $dabaBase = new DatabaseConnection(Config::host, Config::port, Config::database, Config::user, Config::password);
        
         
         
         $this->connection = $dabaBase->getPdo();
 
-        // Création d'un obejet de réflexion pour la classe manipulée par ce DAO
+        // CrÃ©ation d'un obejet de rÃ©flexion pour la classe manipulÃ©e par ce DAO
         $this->reflection = new \ReflectionClass($this->className);
     }
 
     /**
-     * Permet d'executer une insertion d'une entité en base de données
+     * Permet d'executer une insertion d'une entitÃ© en base de donnÃ©es
      *
      * @param $entity :
-     *            instance de l'entité à sauvegarder dans la base de données
+     *            instance de l'entitÃ© Ã  sauvegarder dans la base de donnÃ©es
      */
     public function save($entity)
     {
@@ -91,21 +88,21 @@ class GenericDaoImpl
         // Construction de l'instruction insert into
         $query = "INSERT INTO " . strtolower($this->tableName) . " (";
 
-        // On obtient par réflexion la liste des noms des attributs de
-        // l'entité passée en paramètre
+        // On obtient par rÃ©flexion la liste des noms des attributs de
+        // l'entitÃ© passÃ©e en paramÃ¨tre
         $fields = $this->getFields();
 
         // On parcourt la liste des attributs
         // Ici on suppose que les colonnes de la table et les noms des attributs sont
-        // les mêmes. Si on ne respecte pas cette convenion cette classe ne va pas fonctionner
+        // les mÃªmes. Si on ne respecte pas cette convenion cette classe ne va pas fonctionner
         for ($i = 0; $i < count($fields); $i ++) {
-            // S'il ne s'agit pas de l'attribut clé primaire
-            // (car on suppose que cette clé est autoincrémenté et générée par le GGBD)
+            // S'il ne s'agit pas de l'attribut clÃ© primaire
+            // (car on suppose que cette clÃ© est autoincrÃ©mentÃ© et gÃ©nÃ©rÃ©e par le GGBD)
             if ($fields[$i] != $this->getIdField()) {
                 
                 $query = $query . $fields[$i];
 
-                // S'il ne s'agit pas du dernier élément alors ajouter virgule
+                // S'il ne s'agit pas du dernier Ã©lÃ©ment alors ajouter virgule
                 if ($i < count($fields) - 1) {
                     $query = $query . ", ";
                 }
@@ -117,11 +114,11 @@ class GenericDaoImpl
 
         // On parcourt la liste des attributs
         for ($i = 0; $i < count($fields); $i ++) {
-            // S'il ne s'agit pas de l'attribut clé primaire
+            // S'il ne s'agit pas de l'attribut clÃ© primaire
             if ($fields[$i] != $this->getIdField()) {
-                // On ajoute les noms des paramètres sous form ":nom_attribut"
+                // On ajoute les noms des paramÃ¨tres sous form ":nom_attribut"
                 $query = $query . ":" . $fields[$i];
-                // S'il ne s'agit pas du dernier élément alors ajouter virgule
+                // S'il ne s'agit pas du dernier Ã©lÃ©ment alors ajouter virgule
                 if ($i < sizeof($fields) - 1) {
                     $query = $query . ", ";
                 }
@@ -134,10 +131,10 @@ class GenericDaoImpl
 
             if ($fields[$i] != $this->getIdField()) {
 
-                // Pour chaque attribut on déduit le nom du getter associé.
-                // il est de forme get+nom de l'attribut, avec le première caractère en majiscule
+                // Pour chaque attribut on dÃ©duit le nom du getter associÃ©.
+                // il est de forme get+nom de l'attribut, avec le premiÃ¨re caractÃ¨re en majiscule
                 $getterMethodName = 'get' . ucfirst($fields[$i]);
-                // On appel les getters par réflexion.
+                // On appel les getters par rÃ©flexion.
 
                 $values[$fields[$i]] = $this->callMethod($getterMethodName, $entity);
             }
@@ -171,10 +168,10 @@ class GenericDaoImpl
         $values = [];
         for ($i = 0; $i < count($fields); $i ++) {
 
-            // Pour chaque attribut on déduit le nom du getter associé.
-            // il est de forme get+nom de l'attribut, avec le première caractère en majiscule
+            // Pour chaque attribut on dÃ©duit le nom du getter associÃ©.
+            // il est de forme get+nom de l'attribut, avec le premiÃ¨re caractÃ¨re en majiscule
             $getterMethodName = 'get' . ucfirst($fields[$i]);
-            // On appel les getters par réflexion.
+            // On appel les getters par rÃ©flexion.
             $values[$fields[$i]] = $this->callMethod($getterMethodName, $entity);
         }
 
@@ -182,24 +179,24 @@ class GenericDaoImpl
     }
 
     /**
-     * Permet de retrouver toutes les entités de la base de données
+     * Permet de retrouver toutes les entitÃ©s de la base de donnÃ©es
      *
-     * @return array : un tableau des entités
+     * @return array : un tableau des entitÃ©s
      */
     public function getAll()
     {
         // Construit la requete SELECT
         $query = "SELECT * FROM " . strtolower($this->tableName) . ";";
 
-        // Il s'agit d'une requête paramétrée
+        // Il s'agit d'une requÃªte paramÃ©trÃ©e
         $stmt = $this->connection->prepare($query);
 
-        // On execute la requête
+        // On execute la requÃªte
         if ($stmt->execute()) {
             $result = [];
 
-            // récupère les enregistrement retrouvés de la base de données
-            // puis on copie les données aux objets
+            // rÃ©cupÃ¨re les enregistrement retrouvÃ©s de la base de donnÃ©es
+            // puis on copie les donnÃ©es aux objets
             while ($row = $stmt->fetch()) {
                 $result[] = $this->mapToEntity($row);
             }
@@ -209,7 +206,7 @@ class GenericDaoImpl
     }
 
     /**
-     * Permet de retrouver une entité par sa clé primaire
+     * Permet de retrouver une entitÃ© par sa clÃ© primaire
      *
      * @param
      *            $id
@@ -218,13 +215,13 @@ class GenericDaoImpl
     public function getById($id)
     {
 
-        // On construit la requête
+        // On construit la requÃªte
         $query = "SELECT * FROM " . strtolower($this->tableName) . " WHERE " . $this->getIdField() . " = :id;";
         $stmt = $this->connection->prepare($query);
-        // On indique la valeur du paramètre :id
+        // On indique la valeur du paramÃ¨tre :id
         $stmt->bindParam(':id', $id);
 
-        // On execute la requete et on copie le résultat vers un objet entité
+        // On execute la requete et on copie le rÃ©sultat vers un objet entitÃ©
         if ($stmt->execute()) {
             while ($row = $stmt->fetch()) {
                 return $this->mapToEntity($row);
@@ -234,7 +231,7 @@ class GenericDaoImpl
     }
 
     /**
-     * Permet de retrouver une entité par la valeur d'une colonne
+     * Permet de retrouver une entitÃ© par la valeur d'une colonne
      *
      * @param
      *            $id
@@ -243,13 +240,13 @@ class GenericDaoImpl
     public function getByColumnValue($col, $val)
     {
 
-        // On construit la requête
+        // On construit la requÃªte
         $query = "SELECT * FROM " . strtolower($this->tableName) . " WHERE $col = :val";
         $stmt = $this->connection->prepare($query);
-        // On indique la valeur du paramètre :id
+        // On indique la valeur du paramÃ¨tre :id
         $stmt->bindParam(':val', $val);
 
-        // On execute la requete et on copie le résultat vers un objet entité
+        // On execute la requete et on copie le rÃ©sultat vers un objet entitÃ©
         $data = array();
         if ($stmt->execute()) {
             while ($row = $stmt->fetch()) {
@@ -260,7 +257,7 @@ class GenericDaoImpl
     }
 
     /**
-     * Permet de retrouver des entités en utilisant plusieurs critères
+     * Permet de retrouver des entitÃ©s en utilisant plusieurs critÃ¨res
      *
      * @param
      *            $criterias
@@ -272,7 +269,7 @@ class GenericDaoImpl
             $operator = 'AND';
         }
 
-        // On construit la requête
+        // On construit la requÃªte
         $query = "SELECT * FROM " . strtolower($this->tableName) . " WHERE ";
         $values = [];
 
@@ -293,7 +290,7 @@ class GenericDaoImpl
 
         $results = [];
 
-        // On execute la requete et on copie le résultat vers un objet entité
+        // On execute la requete et on copie le rÃ©sultat vers un objet entitÃ©
         if ($stmt->execute($values)) {
             while ($row = $stmt->fetch()) {
                 $results[] = $this->mapToEntity($row);
@@ -303,7 +300,7 @@ class GenericDaoImpl
     }
 
     /**
-     * Permet de retrouver des entités en utilisant plusieurs critères
+     * Permet de retrouver des entitÃ©s en utilisant plusieurs critÃ¨res
      *
      * @param
      *            $criterias
@@ -312,7 +309,7 @@ class GenericDaoImpl
     public function findByCreteria($criterias, $operators = [])
     {
 
-        // On construit la requête
+        // On construit la requÃªte
         $query = "SELECT * FROM " . strtolower($this->tableName) . " WHERE ";
         $values = [];
 
@@ -332,7 +329,7 @@ class GenericDaoImpl
 
         $results = [];
 
-        // On execute la requete et on copie le résultat vers un objet entité
+        // On execute la requete et on copie le rÃ©sultat vers un objet entitÃ©
         if ($stmt->execute($values)) {
             while ($row = $stmt->fetch()) {
                 $results[] = $this->mapToEntity($row);
@@ -342,7 +339,7 @@ class GenericDaoImpl
     }
 
     /**
-     * Permet de supprimer une ligne dans la base de données dont l'id est passé en pramètre
+     * Permet de supprimer une ligne dans la base de donnÃ©es dont l'id est passÃ© en pramÃ¨tre
      *
      * @param
      *            $id
@@ -376,7 +373,7 @@ class GenericDaoImpl
     }
 
     /**
-     * Permet d'appeler d'une façon dynamique une méthode
+     * Permet d'appeler d'une faÃ§on dynamique une mÃ©thode
      */
     private function callMethod($methodName, $class, $arg = null)
     {
@@ -397,9 +394,9 @@ class GenericDaoImpl
     }
 
     /**
-     * Copie les données d'une ligne de résultat vers un objet
-     * (Elle effectue le mapping entre les lignes d'un résultat d'execution d'une
-     * requête SQL et les objets)
+     * Copie les donnÃ©es d'une ligne de rÃ©sultat vers un objet
+     * (Elle effectue le mapping entre les lignes d'un rÃ©sultat d'execution d'une
+     * requÃªte SQL et les objets)
      *
      * @param
      *            $row
@@ -412,7 +409,7 @@ class GenericDaoImpl
         // On construit dynamiquement une instance
         $entity = $this->reflection->newInstanceArgs();
         for ($i = 0; $i < count($fields); $i ++) {
-            // On appel les setters pour copier les données vers les objets
+            // On appel les setters pour copier les donnÃ©es vers les objets
             $setterMethodName = 'set' . ucfirst($fields[$i]);
             $this->callMethod($setterMethodName, $entity, $row[$fields[$i]]);
         }
